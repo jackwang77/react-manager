@@ -20,7 +20,7 @@ export default class Admin extends React.Component{
                         <Header/>
 
                         <Row className="content">
-                           <Home/>
+                            {this.props.children}
                         </Row>
                         <Footer/>
 
