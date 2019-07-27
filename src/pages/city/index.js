@@ -19,30 +19,15 @@ export default class City extends React.Component{
         this.requestList()
     }
     requestList=()=>{
-        let _this = this
-        axios.ajaxOther({
+
+        var request={
             url:'/open_city',
             method:'get',
             data:{
-                params:{
-                    page:this.params.page,
-                    pageSize:_this.params.pageSize
-                }
+                params:this.params
             }
-        }).then((res)=>{
-            let list = res.result.item_list.map((item,index)=>{
-                item.key=index
-                return item
-            })
-            this.setState({
-                list:list,
-                pagination:Utils.paginationOther(res,(current,pageSize)=>{
-                    _this.params.page = current
-                    _this.params.pageSize = pageSize
-                    _this.requestList()
-                })
-            })
-        })
+        }
+        axios.requestList(this,request)
     }
 
     handleOpenCity=()=>{

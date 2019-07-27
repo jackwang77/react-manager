@@ -2,6 +2,8 @@ import React from 'react'
 import {Card,Button,Table,Form,Select,Modal,message,DatePicker } from 'antd'
 import axios from '../../axios/index'
 import Utils from '../../utils/utils'
+import BaseForm from '../../components/BaseForm'
+import ETable from '../../components/ETable'
 const FormItem = Form.Item
 const Option = Select.Option
 
@@ -16,32 +18,81 @@ export default class Order extends React.Component{
         pageSize:10
     }
 
+    formList = [
+        {
+            type:'SELECT',
+            label:'城市',
+            field:'city',
+            placeholder:'全部',
+            initialValue:'1',
+            width:100,
+            list:[
+                {
+                    id:'0',
+                    name:'全部'
+                },
+                {
+                    id:'1',
+                    name:'北京'
+                },
+                {
+                    id:'2',
+                    name:'天津'
+                },
+                {
+                    id:'3',
+                    name:'上海'
+                }
+            ]
+        },
+        {
+            type:'时间查询'
+        },
+        {
+            type:'SELECT',
+            label:'订单状态',
+            field:'order_status',
+            placeholder:'全部',
+            initialValue:'1',
+            width:120,
+            list:[
+                {
+                    id:'0',
+                    name:'全部'
+                },
+                {
+                    id:'1',
+                    name:'进行中'
+                },
+                {
+                    id:'2',
+                    name:'结束行程'
+                }
+            ]
+        }
+    ]
+
+
     componentDidMount(){
+        this.requestList()
+    }
+
+    filterSubmit = (params)=>{
+
+        Object.assign(this.params,this.params,params)
         this.requestList()
     }
 
     requestList=()=>{
         let _this = this
-        axios.ajaxOther({
+        var request={
             url:'order/list',
             method:'get',
             data:{
                 params:this.params
             }
-        }).then((res)=>{
-            let list = res.result.item_list.map((item,index)=>{
-                item.key = index
-                return item
-            })
-            _this.setState({
-                list,
-                pagination:Utils.paginationOther(res,(current,pageSize)=>{
-                    _this.params.page = current
-                    _this.params.pageSize = pageSize
-                    _this.requestList()
-                })
-            })
-        })
+        }
+        axios.requestList(this,request)
     }
 
     onRowClick=(record,index)=>{
@@ -183,14 +234,23 @@ export default class Order extends React.Component{
         return(
             <div>
                 <Card>
-                    <FilterForm/>
+                    <BaseForm formList={this.formList} filterSubmit={this.filterSubmit}/>
                 </Card>
                 <Card style={{marginTop:10}}>
                     <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button>
                     <Button type="primary" style={{marginLeft:10}} onClick={this.handleConfig}>结束订单</Button>
                 </Card>
                 <div className="content-wrap">
-                    <Table
+                    <ETable
+                        updateSelectedItem={Utils.updateSelectedItem.bind(this)}
+                        columns={columns}
+                        dataSource={this.state.list}
+                        selectedRowKeys={this.state.selectedRowKeys}
+                        selectedItem={this.state.selectedItem}
+                        selectedIds={this.state.selectedIds}
+                        pagination={this.state.pagination}
+                    />
+                    {/*<Table
                     bordered
                     columns={columns}
                     dataSource={this.state.list}
@@ -203,7 +263,7 @@ export default class Order extends React.Component{
                             }
                         }
                     }}
-                    />
+                    />*/}
 
                 </div>
 
